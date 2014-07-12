@@ -1,5 +1,6 @@
 @ECHO OFF
-
+::Allows you to see the error message.. It might not work..
+if "%1"=="" cmd /k %0 OpenedWithoutParameters
 ::Copy this in notepad and save it as .bat
 SETLOCAL enabledelayedexpansion
 rem Define auxiliary While variables
@@ -9,21 +10,18 @@ set Break=exit ^^!WhileResult^^!
 set EndWhile=) else exit ^^!WhileResult^^! ) else for /F  %%z in ('cmd /C "%~F0" While ^^!WhileBody^^!') do set "return=%%z"
 if "%1" equ "While" goto %2
 set use=This program purpose is to view all the gifs or webms that exist in a directory
-SET Version=1.1
+SET Version=1.0999333333337
 set nname=%~n0
 set fulllpath=%~dp0
-set DefaultColor=grey
 
 ::default size is 150, perhaps you may find that more reasonable
 set sizee=150
-::1 is true, 0 is false
 set gif=1
 set jpg=1
 set png=1
 set webm=1
 if /I "%1"=="help" (goto help) else if "%1"=="/?" (goto help) else if /I "%1"=="/h" (goto help)
 
-::Okay, this is known as batch macros, this thing checks what formats are in a string, and avoids them
 set imageAvoid=do^
  (call :indexOf res "%%f" "gif" ^
   ^&(if not "^!res^!"=="-1" set gif=0 )^
@@ -34,7 +32,7 @@ set imageAvoid=do^
  ^&call :indexOf res "%%f" "webm"^
  ^&(if not "^!res^!"=="-1" set webm=0))^
 
-::This macro reads %0.bat.ini if exists
+ 
 set readImgIni=do (for /f "usebackq delims=" %%b in ("%%a") do ^
 set ln=%%b ^&if "^!ln:~0,1^!"=="[" (set currea=^!ln^!) else if not  "^!ln:~0,1^!"=="[" (for /f "tokens=1,2 delims==" %%c in ("^!ln^!") do ^
      call :indexOf res "%%c" "wizard"^&if "^!res^!"=="0" (^
@@ -44,9 +42,6 @@ set ln=%%b ^&if "^!ln:~0,1^!"=="[" (set currea=^!ln^!) else if not  "^!ln:~0,1^!
 	   set skipWizard=1)) else^
 	 call :indexOf res "%%c" "pixelSize"^&if "^!res^!"=="0" (^
 	  set /a sizee=%%d^
-	 ) else ^
-   call :indexOf res "%%c" "backgroundcolor"^&if "^!res^!"=="0" (^
-	  set color=%%d^
 	 ) else ^
 	 call :indexOf res "%%c" "avoidFormat"^&if "^!res^!"=="0" (^
 	  for /f "tokens=1-26" %%f in ("%%d") !imageAvoid! ^
@@ -64,9 +59,12 @@ set ln=%%b ^&if "^!ln:~0,1^!"=="[" (set currea=^!ln^!) else if not  "^!ln:~0,1^!
 ) ^2^>nul	
 
 
+ 
+
+if exist "%~nx0.ini" echo ini found, reading configuration&for /f "tokens=1-26" %%a in ("%~nx0.ini") %readImgIni%
+
 color a
 :args
-::Read command line arguments
 IF NOT "%1"=="" (
 echo args?
 IF "%skipWizard%" == "" set skipWizard=1
@@ -78,9 +76,6 @@ IF "%skipWizard%" == "" set skipWizard=1
         SHIFT
     ) ELSE IF /I "%1"=="/size" (
         SET /a sizee=%2
-        SHIFT
-    ) ELSE IF /I "%1"=="/color" (
-        SET /a color=%2
         SHIFT
     ) ELSE call :indexOf res %1 "/avoid"&IF  "!res!"=="0" (
         set g=%1
@@ -104,15 +99,12 @@ IF "%skipWizard%" == "" set skipWizard=1
     GOTO :args
 )
 
-
-::Execute macros
-if exist "%~nx0.ini" echo ini found, reading configuration&for /f "tokens=1-26" %%a in ("%~nx0.ini") %readImgIni%
 set currentDirectory=%cd%
 set normpath=""
 ::echo skipWizard %skipWizard%?&pause
 if not "%skipWizard%" == "1" call :Wizard
 if not exist "%path2%" (
-echo no path specified assuming default path) else (cd %path2%>nul
+echo no path specified) else (cd %path2%>nul
 if not "%__as%"=="t"  set normpath=%path2%\)
 IF NOT "%OS%"=="Windows_NT" GOTO End
 
@@ -162,8 +154,7 @@ echo %OutFile%
 > %OutFile% ECHO ^<html^>
 >> %OutFile% ECHO ^<head^>
 >> %OutFile% ECHO ^<title^>All %check% found in directory %CD%^</title^>
-::Stylesheet of the output HTML
->> %OutFile% ECHO ^<style^>body{background:^%DefaultColor%^;font-family:sans-serif^;color:black}img{width:%sizee%px^;height:%sizee%px}ul{padding:0^;list-style: none^;}li{float:left^;margin:^2px}^<^/style^>
+>> %OutFile% ECHO ^<style^>body{background:^#00FF00^;font-family:sans-serif^;}img{width:%sizee%px^;height:%sizee%px}ul{padding:0^;list-style: none^;}li{float:left^;margin:^2px}^<^/style^>
 >> %OutFile% ECHO ^</head^>
 >> %OutFile% ECHO ^<body^>
 >> %OutFile% ECHO ^<h2^>%CD%^</h2^>
@@ -184,7 +175,6 @@ if %webmext%==1 (for /f "tokens=* delims=" %%A in ('dir /b/a   *.webm') DO (
 ))
 
 echo ^</ul^> >> %OutFile%
-::JavaScript of the output HTML
 >> %OutFile% ECHO ^<script^>function imageSize^(imgElement^){!NL!if^(imgElement.big^){!NL!imgElement.style.height^=%sizee%^;!NL!imgElement.style.width^=%sizee%^;!NL!imgElement.big^=false^;!NL!return^;!NL!}!NL!var i^=new Image!NL!i.onload^=function^(^){!NL!var x^={height:i.height^,width:i.width}!NL!var h^=b.clientHeight^,w^=b.clientWidth^,aspectRatioDiff^=^1^;!NL!switch^(s.selectedIndex^){!NL!case ^1:!NL!if^(x.height^>h^){!NL!aspectRatioDiff^=x.height^/h^;!NL!x.height^/^=aspectRatioDiff^;!NL!x.width^/^=aspectRatioDiff^;!NL!}!NL!case ^3:!NL!if^(x.width^>w^){!NL!aspectRatioDiff^=x.width^/w^;!NL!x.height^/^=aspectRatioDiff^;!NL!x.width^/^=aspectRatioDiff^;!NL!}!NL!break^;!NL!case ^2:!NL!if^(x.height^>h^){!NL!aspectRatioDiff^=x.height^/h^;!NL!x.height^/^=aspectRatioDiff^;!NL!x.width^/^=aspectRatioDiff^;!NL!}!NL!break^;!NL!}!NL!imgElement.style.height^=x.height^;!NL!imgElement.style.width^=x.width^;!NL!imgElement.big^=true!NL!}!NL!i.src^=imgElement.src^;!NL!}!NL!document.addEventListener^(^'click^'^,function^(a^){!NL!if^(a.target^&^&a.target.src^)!NL!imageSize^(a.target^)!NL!}^,false^)!NL!var s^=document.getElementById^(^'s^'^)^,b^=document.documentElement.getElementsByTagName^(^'body^'^)[^0]^;var but^=document.getElementById^(^'all^'^)^;but^&^&but.addEventListener^(^'click^'^,function^(a^){!NL!!NL!for^(var i^=^0^;i^<document.images.length^;i++^){!NL!if^(document.images[i].big^^^^but.checked^){!NL!imageSize^(document.images[i]^)^;!NL!}!NL!}!NL!!NL!}^,false^)^;var ul^=document.getElementsByTagName^(^'ul^'^)[^0]^;!NL!file.addEventListener^(^'change^'^,function^(a^){!NL!for^(var i^=^0^;i^<file.files.length^;i++^){!NL!readFile^(file.files[i]^)^;!NL!}!NL!}^,false^)!NL!function fileDone^(reader^){!NL!^/^/a new function just to put an argument as a closure? fuck!NL!return function^(ev^){!NL!var li^=document.createElement^(^'li^'^)^,img^;!NL!^(img^=new Image^).src^=reader.result^;!NL!li.appendChild^(img^)^;!NL!ul.appendChild^(li^)^;!NL!}!NL!}!NL!function readFile^(file^){!NL!var reader^=new FileReader^;!NL!reader.addEventListener^(^'loadend^'^,fileDone^(reader^)^,false^)^;!NL!reader.readAsDataURL^(file^)!NL!}^<^/script^>
 >> %OutFile% ECHO ^</body^>
 >> %OutFile% ECHO ^</html^>
@@ -200,7 +190,7 @@ goto end
 Echo  %use%
 echo It creates an HTML file of the images located in a directory.
 echo.
-echo %0 [/s] [/g] [/selfFolder] [/path path]  [/size size] [/avoid:files] [/color color]
+echo %0 [/s] [/g] [/selfFolder] [/path path]  [/size size] [/avoid:files]
 echo.
 echo   /selfFolder it simply writes the html file in the directory you specified. if any
 echo   /path if you want to make an html file of all the images in some directory
@@ -208,7 +198,6 @@ echo   /g Only gifs, it won't display webms nor other formats (!INCOMING)
 echo   /size specify size in pixels of the previews
 echo   /avoid it specifies what formats you want to avoid ex: /avoid:png,jpg
 echo   /paged
-echo   /color color
 echo   /s skips wizard
 echo if you specify no directory it will start in current directory.
 goto End
@@ -315,8 +304,6 @@ if /I %key%== Y (echo.&echo Great! let's move on now) else if /I %key%== N (goto
 echo.
 set /p opt=Type how many pixels large, you want the images to be:
 if not "%opt%"=="" SET /a sizee=%opt%
-set /p opt=Type the background color (HTML ruls):
-if not "%opt%"=="" SET DefaultColor=%opt%
 :optsav
 
 call :choice "Do you want to save these options (to %~nx0.ini)? (Y/N)" "YNyn"
@@ -335,8 +322,6 @@ if %webm%==0 (if not "!check!"=="" set "check=!check!,"
 set check=!check!WEBM)
 set /p " =avoidFormat=" <nul >>%~nx0.ini
 echo.!check!>> %~nx0.ini
-set /p " =backgroundcolor=" <nul >>%~nx0.ini
-echo.%DefaultColor%>> %~nx0.ini
 echo pixelSize=%sizee% >> %~nx0.ini
 set /p " =Wizard=" <nul >>%~nx0.ini
 call :choice "Do you want this wizard to appear next time? (Y/N)" "YNyn"
