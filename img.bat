@@ -13,6 +13,7 @@ set use=This program purpose is to view all the gifs or webms that exist in a di
 SET Version=1.0999333333337
 set nname=%~n0
 set fulllpath=%~dp0
+set DefaultColor=grey
 
 ::default size is 150, perhaps you may find that more reasonable
 set sizee=150
@@ -42,6 +43,9 @@ set ln=%%b ^&if "^!ln:~0,1^!"=="[" (set currea=^!ln^!) else if not  "^!ln:~0,1^!
 	   set skipWizard=1)) else^
 	 call :indexOf res "%%c" "pixelSize"^&if "^!res^!"=="0" (^
 	  set /a sizee=%%d^
+	 ) else ^
+   call :indexOf res "%%c" "backgroundcolor"^&if "^!res^!"=="0" (^
+	  set color=%%d^
 	 ) else ^
 	 call :indexOf res "%%c" "avoidFormat"^&if "^!res^!"=="0" (^
 	  for /f "tokens=1-26" %%f in ("%%d") !imageAvoid! ^
@@ -76,6 +80,9 @@ IF "%skipWizard%" == "" set skipWizard=1
         SHIFT
     ) ELSE IF /I "%1"=="/size" (
         SET /a sizee=%2
+        SHIFT
+    ) ELSE IF /I "%1"=="/color" (
+        SET /a color=%2
         SHIFT
     ) ELSE call :indexOf res %1 "/avoid"&IF  "!res!"=="0" (
         set g=%1
@@ -154,7 +161,7 @@ echo %OutFile%
 > %OutFile% ECHO ^<html^>
 >> %OutFile% ECHO ^<head^>
 >> %OutFile% ECHO ^<title^>All %check% found in directory %CD%^</title^>
->> %OutFile% ECHO ^<style^>body{background:^#00FF00^;font-family:sans-serif^;}img{width:%sizee%px^;height:%sizee%px}ul{padding:0^;list-style: none^;}li{float:left^;margin:^2px}^<^/style^>
+>> %OutFile% ECHO ^<style^>body{background:^%DefaultColor%^;font-family:sans-serif^;}img{width:%sizee%px^;height:%sizee%px}ul{padding:0^;list-style: none^;}li{float:left^;margin:^2px}^<^/style^>
 >> %OutFile% ECHO ^</head^>
 >> %OutFile% ECHO ^<body^>
 >> %OutFile% ECHO ^<h2^>%CD%^</h2^>
@@ -190,7 +197,7 @@ goto end
 Echo  %use%
 echo It creates an HTML file of the images located in a directory.
 echo.
-echo %0 [/s] [/g] [/selfFolder] [/path path]  [/size size] [/avoid:files]
+echo %0 [/s] [/g] [/selfFolder] [/path path]  [/size size] [/avoid:files] [/color color]
 echo.
 echo   /selfFolder it simply writes the html file in the directory you specified. if any
 echo   /path if you want to make an html file of all the images in some directory
@@ -198,6 +205,7 @@ echo   /g Only gifs, it won't display webms nor other formats (!INCOMING)
 echo   /size specify size in pixels of the previews
 echo   /avoid it specifies what formats you want to avoid ex: /avoid:png,jpg
 echo   /paged
+echo   /color color
 echo   /s skips wizard
 echo if you specify no directory it will start in current directory.
 goto End
@@ -304,6 +312,8 @@ if /I %key%== Y (echo.&echo Great! let's move on now) else if /I %key%== N (goto
 echo.
 set /p opt=Type how many pixels large, you want the images to be:
 if not "%opt%"=="" SET /a sizee=%opt%
+set /p opt=Type the background color (HTML ruls):
+if not "%opt%"=="" SET DefaultColor=%opt%
 :optsav
 
 call :choice "Do you want to save these options (to %~nx0.ini)? (Y/N)" "YNyn"
@@ -322,6 +332,8 @@ if %webm%==0 (if not "!check!"=="" set "check=!check!,"
 set check=!check!WEBM)
 set /p " =avoidFormat=" <nul >>%~nx0.ini
 echo.!check!>> %~nx0.ini
+set /p " =backgroundcolor=" <nul >>%~nx0.ini
+echo.%DefaultColor%>> %~nx0.ini
 echo pixelSize=%sizee% >> %~nx0.ini
 set /p " =Wizard=" <nul >>%~nx0.ini
 call :choice "Do you want this wizard to appear next time? (Y/N)" "YNyn"
