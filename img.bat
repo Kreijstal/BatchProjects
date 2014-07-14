@@ -10,7 +10,7 @@ set Break=exit ^^!WhileResult^^!
 set EndWhile=) else exit ^^!WhileResult^^! ) else for /F  %%z in ('cmd /C "%~F0" While ^^!WhileBody^^!') do set "return=%%z"
 if "%1" equ "While" goto %2
 set use=This program purpose is to view all the gifs or webms that exist in a directory
-SET Version=1.0999333333337
+SET Version=1.12
 set nname=%~n0
 set fulllpath=%~dp0
 set DefaultColor=grey
