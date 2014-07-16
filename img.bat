@@ -158,6 +158,8 @@ set check=!check!PNGs)
 if %webm%==1 (if not "%check%"=="" set "check=%check%, "
 set check=!check!WEBMs)
 echo %OutFile%
+::Javascript function to replace HTML to batch escaped echo.
+::function ASCIIToEncodedBatch(str){return str.replace(/%/g,'%%').replace(/\^/g,'^^').replace(/[&\|<>"'`\=\\\/,;\(!\)0-9]/g,function(a){return '^'+a;}).replace(/[\n\r]/g,function(a){return '^'+a+a})}
 > %OutFile% ECHO ^<html^>
 >> %OutFile% ECHO ^<head^>
 >> %OutFile% ECHO ^<title^>All %check% found in directory %CD%^</title^>
