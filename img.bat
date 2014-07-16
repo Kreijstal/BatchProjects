@@ -13,7 +13,7 @@ set Break=exit ^^!WhileResult^^!
 set EndWhile=) else exit ^^!WhileResult^^! ) else for /F  %%z in ('cmd /C "%~F0" While ^^!WhileBody^^!') do set "return=%%z"
 if "%1" equ "While" goto %2
 set use=This program purpose is to view all the gifs or webms that exist in a directory
-SET Version=1.12
+SET Version=1.13
 set nname=%~n0
 set fulllpath=%~dp0
 set DefaultColor=grey
@@ -39,7 +39,8 @@ set imageAvoid=do^
  ^&call :indexOf res "%%f" "webm"^
  ^&(if not "^!res^!"=="-1" set webm=0))^
 
-::This macro reads %0.bat.ini if exists 
+
+::The following line reads %0.bat.ini only if it exists
 set readImgIni=do (for /f "usebackq delims=" %%b in ("%%a") do ^
 set ln=%%b ^&if "^!ln:~0,1^!"=="[" (set currea=^!ln^!) else if not  "^!ln:~0,1^!"=="[" (for /f "tokens=1,2 delims==" %%c in ("^!ln^!") do ^
      call :indexOf res "%%c" "wizard"^&if "^!res^!"=="0" (^
@@ -74,7 +75,7 @@ color a
 :args
 ::Read command line arguments
 IF NOT "%1"=="" (
-echo args?
+echo Reading command line arguments
 IF "%skipWizard%" == "" set skipWizard=1
     IF /I "%1"=="/path" (
         SET path2=%2
@@ -171,7 +172,7 @@ echo %OutFile%
 >> %OutFile% ECHO ^<head^>
 >> %OutFile% ECHO ^<title^>All %check% found in directory %CD%^</title^>
 ::Stylesheet of the output HTML
->> %OutFile% ECHO ^<style^>body{background:^%DefaultColor%^;font-family:sans-serif^;color:black}img{width:%sizee%px^;height:%sizee%px}ul{padding:0^;list-style: none^;}li{float:left^;margin:^2px}^<^/style^>
+>> %OutFile% ECHO ^<style^>body{background:^%DefaultColor%^;font-family:sans-serif^;color:black}img{width:%sizee%px^;height:%sizee%px^;cursor:-webkit-zoom-in^;cursor:-moz-zoom-in^;cursor:zoom-in^;}.img-zoom-out{cursor:-webkit-zoom-out^;cursor:-moz-zoom-out^;cursor:zoom-out^;}ul{padding:0^;list-style: none^;}li{float:left^;margin:^2px}^<^/style^>
 >> %OutFile% ECHO ^</head^>
 >> %OutFile% ECHO ^<body^>
 >> %OutFile% ECHO ^<h2^>%CD%^</h2^>
@@ -193,7 +194,7 @@ if %webmext%==1 (for /f "tokens=* delims=" %%A in ('dir /b/a   *.webm') DO (
 
 echo ^</ul^> >> %OutFile%
 ::JavaScript of the output HTML
->> %OutFile% ECHO ^<script^>function imageSize^(imgElement^){!NL!if^(imgElement.big^){!NL!imgElement.style.height^=%sizee%^;!NL!imgElement.style.width^=%sizee%^;!NL!imgElement.big^=false^;!NL!return^;!NL!}!NL!var i^=new Image!NL!i.onload^=function^(^){!NL!var x^={height:i.height^,width:i.width}!NL!var h^=b.clientHeight^,w^=b.clientWidth^,aspectRatioDiff^=^1^;!NL!switch^(s.selectedIndex^){!NL!case ^1:!NL!if^(x.height^>h^){!NL!aspectRatioDiff^=x.height^/h^;!NL!x.height^/^=aspectRatioDiff^;!NL!x.width^/^=aspectRatioDiff^;!NL!}!NL!case ^3:!NL!if^(x.width^>w^){!NL!aspectRatioDiff^=x.width^/w^;!NL!x.height^/^=aspectRatioDiff^;!NL!x.width^/^=aspectRatioDiff^;!NL!}!NL!break^;!NL!case ^2:!NL!if^(x.height^>h^){!NL!aspectRatioDiff^=x.height^/h^;!NL!x.height^/^=aspectRatioDiff^;!NL!x.width^/^=aspectRatioDiff^;!NL!}!NL!break^;!NL!}!NL!imgElement.style.height^=x.height^;!NL!imgElement.style.width^=x.width^;!NL!imgElement.big^=true!NL!}!NL!i.src^=imgElement.src^;!NL!}!NL!document.addEventListener^(^'click^'^,function^(a^){!NL!if^(a.target^&^&a.target.src^)!NL!imageSize^(a.target^)!NL!}^,false^)!NL!var s^=document.getElementById^(^'s^'^)^,b^=document.documentElement.getElementsByTagName^(^'body^'^)[^0]^;var but^=document.getElementById^(^'all^'^)^;but^&^&but.addEventListener^(^'click^'^,function^(a^){!NL!!NL!for^(var i^=^0^;i^<document.images.length^;i++^){!NL!if^(document.images[i].big^^^^but.checked^){!NL!imageSize^(document.images[i]^)^;!NL!}!NL!}!NL!!NL!}^,false^)^;var ul^=document.getElementsByTagName^(^'ul^'^)[^0]^;!NL!file.addEventListener^(^'change^'^,function^(a^){!NL!for^(var i^=^0^;i^<file.files.length^;i++^){!NL!readFile^(file.files[i]^)^;!NL!}!NL!}^,false^)!NL!function fileDone^(reader^){!NL!^/^/a new function just to put an argument as a closure? fuck!NL!return function^(ev^){!NL!var li^=document.createElement^(^'li^'^)^,img^;!NL!^(img^=new Image^).src^=reader.result^;!NL!li.appendChild^(img^)^;!NL!ul.appendChild^(li^)^;!NL!}!NL!}!NL!function readFile^(file^){!NL!var reader^=new FileReader^;!NL!reader.addEventListener^(^'loadend^'^,fileDone^(reader^)^,false^)^;!NL!reader.readAsDataURL^(file^)!NL!}^<^/script^>
+>> %OutFile% ECHO ^<script^>function imageSize^(imgElement^){!NL!if^(imgElement.big^){!NL!imgElement.style.height^=""^;!NL!imgElement.style.width^=""^;imgElement.className=""^;!NL!imgElement.big^=false^;!NL!return^;!NL!}!NL!var i^=new Image!NL!i.onload^=function^(^){!NL!var x^={height:i.height^,width:i.width}!NL!var h^=b.clientHeight^,w^=b.clientWidth^,aspectRatioDiff^=^1^;!NL!switch^(s.selectedIndex^){!NL!case ^1:!NL!if^(x.height^>h^){!NL!aspectRatioDiff^=x.height^/h^;!NL!x.height^/^=aspectRatioDiff^;!NL!x.width^/^=aspectRatioDiff^;!NL!}!NL!case ^3:!NL!if^(x.width^>w^){!NL!aspectRatioDiff^=x.width^/w^;!NL!x.height^/^=aspectRatioDiff^;!NL!x.width^/^=aspectRatioDiff^;!NL!}!NL!break^;!NL!case ^2:!NL!if^(x.height^>h^){!NL!aspectRatioDiff^=x.height^/h^;!NL!x.height^/^=aspectRatioDiff^;!NL!x.width^/^=aspectRatioDiff^;!NL!}!NL!break^;!NL!}!NL!imgElement.style.height^=x.height^;!NL!imgElement.style.width^=x.width^;!NL!imgElement.big^=true^;imgElement.className="img-zoom-out"^;!NL!}!NL!i.src^=imgElement.src^;!NL!}!NL!document.addEventListener^(^'click^'^,function^(a^){!NL!if^(a.target^&^&a.target.src^)!NL!imageSize^(a.target^)!NL!}^,false^)!NL!var s^=document.getElementById^(^'s^'^)^,b^=document.documentElement.getElementsByTagName^(^'body^'^)[^0]^;var but^=document.getElementById^(^'all^'^)^;but^&^&but.addEventListener^(^'click^'^,function^(a^){!NL!!NL!for^(var i^=^0^;i^<document.images.length^;i++^){!NL!if^(document.images[i].big^^^^but.checked^){!NL!imageSize^(document.images[i]^)^;!NL!}!NL!}!NL!!NL!}^,false^)^;var ul^=document.getElementsByTagName^(^'ul^'^)[^0]^;!NL!file.addEventListener^(^'change^'^,function^(a^){!NL!for^(var i^=^0^;i^<file.files.length^;i++^){!NL!readFile^(file.files[i]^)^;!NL!}!NL!}^,false^)!NL!function fileDone^(reader^){!NL!^/^/a new function just to put an argument as a closure? fuck!NL!return function^(ev^){!NL!var li^=document.createElement^(^'li^'^)^,img^;!NL!^(img^=new Image^).src^=reader.result^;!NL!li.appendChild^(img^)^;!NL!ul.appendChild^(li^)^;!NL!}!NL!}!NL!function readFile^(file^){!NL!var reader^=new FileReader^;!NL!reader.addEventListener^(^'loadend^'^,fileDone^(reader^)^,false^)^;!NL!reader.readAsDataURL^(file^)!NL!}^<^/script^>
 >> %OutFile% ECHO ^</body^>
 >> %OutFile% ECHO ^</html^>
 
