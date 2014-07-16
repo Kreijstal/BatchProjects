@@ -1,5 +1,5 @@
 @ECHO OFF
-
+::I added a github, so all updates will be here, lol https://github.com/RainbowDangerDash/BatchProjects/blob/master/img.bat
 ::Copy this in notepad and save it as .bat
 SETLOCAL enabledelayedexpansion
 rem Define auxiliary While variables
