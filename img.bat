@@ -1,5 +1,9 @@
 @ECHO OFF
+
 ::I added a github, so all updates will be here, lol https://github.com/RainbowDangerDash/BatchProjects/blob/master/img.bat
+::Allows you to see the error message.. It might not work..
+if "%1"=="" cmd /k %0 OpenedWithoutParameters
+
 ::Copy this in notepad and save it as .bat
 SETLOCAL enabledelayedexpansion
 rem Define auxiliary While variables
@@ -9,7 +13,7 @@ set Break=exit ^^!WhileResult^^!
 set EndWhile=) else exit ^^!WhileResult^^! ) else for /F  %%z in ('cmd /C "%~F0" While ^^!WhileBody^^!') do set "return=%%z"
 if "%1" equ "While" goto %2
 set use=This program purpose is to view all the gifs or webms that exist in a directory
-SET Version=1.1
+SET Version=1.12
 set nname=%~n0
 set fulllpath=%~dp0
 set DefaultColor=grey
@@ -23,6 +27,7 @@ set png=1
 set webm=1
 if /I "%1"=="help" (goto help) else if "%1"=="/?" (goto help) else if /I "%1"=="/h" (goto help)
 
+
 ::Okay, this is known as batch macros, this thing checks what formats are in a string, and avoids them
 set imageAvoid=do^
  (call :indexOf res "%%f" "gif" ^
@@ -34,7 +39,7 @@ set imageAvoid=do^
  ^&call :indexOf res "%%f" "webm"^
  ^&(if not "^!res^!"=="-1" set webm=0))^
 
-::This macro reads %0.bat.ini if exists
+::This macro reads %0.bat.ini if exists 
 set readImgIni=do (for /f "usebackq delims=" %%b in ("%%a") do ^
 set ln=%%b ^&if "^!ln:~0,1^!"=="[" (set currea=^!ln^!) else if not  "^!ln:~0,1^!"=="[" (for /f "tokens=1,2 delims==" %%c in ("^!ln^!") do ^
      call :indexOf res "%%c" "wizard"^&if "^!res^!"=="0" (^
@@ -64,6 +69,7 @@ set ln=%%b ^&if "^!ln:~0,1^!"=="[" (set currea=^!ln^!) else if not  "^!ln:~0,1^!
 ) ^2^>nul	
 
 
+ 
 color a
 :args
 ::Read command line arguments
@@ -104,9 +110,9 @@ IF "%skipWizard%" == "" set skipWizard=1
     GOTO :args
 )
 
-
 ::Execute macros
 if exist "%~nx0.ini" echo ini found, reading configuration&for /f "tokens=1-26" %%a in ("%~nx0.ini") %readImgIni%
+
 set currentDirectory=%cd%
 set normpath=""
 ::echo skipWizard %skipWizard%?&pause
